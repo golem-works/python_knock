@@ -1,44 +1,41 @@
-# TCPserverを自作   遠隔で操作できるsocketのサーバ側
+### 02_socket_remot_server.py
+### 悪用厳禁です。socket通信のサーバー側のコードです。
 
-import sys
 import os
-import socket
 import subprocess
+import socket
 
-IP = sys.argv[1]
-PORT = int(sys.argv[2])
-num = int(sys.argv[3])
-
+IP = "127.0.0.1"
+PORT = 9000
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((IP, PORT))
-    s.listen(num)
-    
+    s.listen(1)
+
     conn, addr = s.accept()
-    conn.sendall(f"接続待機 IP:{IP} PORT:{PORT} 受け入れ数:{num}".encode())
-    
-    
+    print(f"接続開始:IP:{IP}, PORT:{PORT}")
+
     while True:
         try:
             cmd = conn.recv(1024).decode().strip()
-            if cmd in ("exit","quit"):
-                print(f"リモートを終了:{cmd}")
-                break
-                
-            if cmd.startswith("cd "):
-                try:
-                    os.chdir(cmd[3:].strip())
-                    conn.sendall(f'{cmd}:{os.getcwd()}'.encode())
-                except Exception as e:
-                    conn.sendall(f'コマンドエラー:{e}'.encode())
+            if not cmd:
                 continue
-                
+            if cmd.lower() == "exit":
+                break
+            if cmd.startswith("cd "):
+                os.chdir(cmd[3:].strip())
+                conn.sendall(f"{cmd}:{os.getcwd()}".encode())
+
             try:
                 output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+                conn.sendall(output)
             except subprocess.CalledProcessError as e:
-                output = e.output
-            conn.sendall(output)
-                
+                output= e.output
+
+                conn.sendall(output)
         except Exception as e:
-            conn.sendall(f"error:{e}".encode())
-                    
+            error_message = f"エラー: {str(e)}"
+            conn.sendall(error_message.encode())
+
+
+        
