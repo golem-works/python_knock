@@ -20,6 +20,7 @@
 | `04_network_node.py` | networkxとmatplotlibによるノード/エッジの通信と可視化 |
 | `05_hex.py` | 16進数の文字列をデコードして人間の文字列に変換する |
 | `06_sql_login.py` | MySQLと接続し、ユーザー名とパスワードのログイン認証を行う |
+| `07_chat_bot.py` |  辞書応答形式の簡単な応答をするchatbot |
 
 ---
 
@@ -66,5 +67,6 @@ pip install matplotlib
 * すべてのコードは MITライセンス のもとに公開しています。
 
 ```
+
 
 
